@@ -1,0 +1,13 @@
+{
+    "name": "vanilla-nilla-calculator",
+    "version": "1.0.0",
+    "author": "jkim000",
+    "description": "just a simple tool to help understand the language of the universe",
+    "main": "index.html",
+    "scripts": {},
+    "dependencies": {},
+    "devDependencies": {},
+    "resolutions": {},
+    "keywords": [],
+    "license": "MIT"
+}
