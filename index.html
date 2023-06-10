@@ -3,14 +3,77 @@
     <head>
         <title>Vanilla Nilla Calculator</title>
         <meta charset="UTF-8" />
+        <link rel="stylesheet" href="src/styles.css" />
     </head>
 
     <body>
-        <div id="app"></div>
-        <div class="container">
-            <div id="calculator">
-                <form><input type="text" /></form>
-            </div>
+        <div id="calculator">
+            <form>
+                <div class="display">
+                    <input type="text" name="display" class="" />
+                    <!-- <input type="text" name="display" class="" /> -->
+                </div>
+                <div class="row">
+                    <input type="button" value="%" class="button operator" />
+                    <input type="button" value="CE" class="button operator" />
+                    <input type="button" value="C" class="button operator" />
+                    <input
+                        type="button"
+                        value="&#8592;"
+                        class="button operator"
+                    />
+                </div>
+                <div class="row">
+                    <input type="button" value=":>" class="button operator" />
+                    <input type="button" value="._." class="button operator" />
+                    <input type="button" value="^_^" class="button operator" />
+                    <input
+                        type="button"
+                        value="&divide;"
+                        class="button operator"
+                    />
+                </div>
+                <div class="row">
+                    <input type="button" value="7" class="button numberpad" />
+                    <input type="button" value="8" class="button numberpad" />
+                    <input type="button" value="9" class="button numberpad" />
+                    <input
+                        type="button"
+                        value="&times;"
+                        class="button operator"
+                    />
+                </div>
+                <div class="row">
+                    <input type="button" value="4" class="button numberpad" />
+                    <input type="button" value="5" class="button numberpad" />
+                    <input type="button" value="6" class="button numberpad" />
+                    <input
+                        type="button"
+                        value="&minus;"
+                        class="button operator"
+                    />
+                </div>
+                <div class="row">
+                    <input type="button" value="1" class="button numberpad" />
+                    <input type="button" value="2" class="button numberpad" />
+                    <input type="button" value="3" class="button numberpad" />
+                    <input
+                        type="button"
+                        value="&plus;"
+                        class="button operator"
+                    />
+                </div>
+                <div class="row">
+                    <input type="button" value="+/-" class="button numberpad" />
+                    <input type="button" value="0" class="button numberpad" />
+                    <input type="button" value="." class="button numberpad" />
+                    <input
+                        type="button"
+                        value="&equals;"
+                        class="button equal"
+                    />
+                </div>
+            </form>
         </div>
 
         <script src="src/index.js"></script>
