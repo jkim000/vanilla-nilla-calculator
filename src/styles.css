@@ -1,46 +1,116 @@
-body {
-    background-color: rgb(71, 71, 71);
-    padding: 0;
+* {
     margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+
+#app {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    height: 100vh;
+    background-color: #474747;
 }
 
-#calculator {
+.calculator {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    min-width: 275px;
+    max-width: 575px;
+    min-height: 640px;
+    padding: 48px 4px 4px 4px;
     background-color: #1b1b1b;
-    padding: 4px;
     border-radius: 8px;
-    width: 624px;
-    min-width: 312px;
-    height: 832px;
-    min-height: 416px;
+    overflow: hidden;
+}
+
+.displays {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    height: 135px;
+    text-align: right;
+    color: #fbfbfb;
+}
+
+.historical {
+    margin: 2rem 0 0.6rem 0;
+    color: #686868;
+    font-size: large;
+}
+
+.current {
+    margin-bottom: 0.8rem;
+    font-size: xxx-large;
+}
+
+.calculator form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .row {
     display: flex;
+    flex: 1;
     justify-content: space-evenly;
     align-items: stretch;
     align-content: stretch;
 }
 
-#calculator form input {
+form input {
+    width: 25%;
+    margin: 2px;
     border: none;
     border-radius: 4px;
-    margin: 2px;
-    width: 25%;
     color: #fbfbfb;
+    font-size: x-large;
 }
 
 .numberpad {
     background-color: #686868;
 }
 
+.numberpad:hover {
+    background-color: #323232;
+}
+
+.numberpad:active {
+    background-color: #1b1b1b;
+}
+
 .operator {
     background-color: #323232;
 }
 
+.operator:hover {
+    background-color: #686868;
+}
+
+.operator:active {
+    background-color: #7e7e7e;
+}
+
 .equal {
     background-color: #10c1ff;
+}
+
+.equal:hover {
+    background-color: #00abe9;
+}
+
+.equal:active {
+    background-color: #008fc4;
+}
+
+.cursive {
+    font-family: "Times New Roman", Times, serif;
 }
