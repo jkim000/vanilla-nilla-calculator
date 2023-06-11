@@ -46,19 +46,13 @@
     font-size: xxx-large;
 }
 
-.calculator form {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
 .buttons {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-.row {
+.buttons > .row {
     display: flex;
     flex: 1;
     justify-content: space-evenly;
@@ -66,7 +60,7 @@
     align-content: stretch;
 }
 
-form input {
+input {
     width: 25%;
     margin: 2px;
     border: none;
