@@ -95,6 +95,7 @@ input {
 
 .equal {
     background-color: #10c1ff;
+    color: #1b1b1b;
 }
 
 .equal:hover {
