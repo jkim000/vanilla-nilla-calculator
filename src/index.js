@@ -13,9 +13,25 @@ for (let key of keys) {
 
     key.addEventListener("click", () => {
         if (keyValue === "C") {
+            input = "";
+            currentDisplay.innerHTML = "";
+            historicalDisplay.innerHTML = "";
         } else if (keyValue === "CE") {
+            input = "";
+            currentDisplay.innerHTML = "";
         } else if (keyValue === "←") {
+            input = input.slice(0, -1);
+            currentDisplay.innerHTML = input;
         } else if (keyValue === "+/-") {
+            const result = HandlePlusMinus(
+                input,
+                currentDisplay.innerHTML,
+                historicalDisplay.innerHTML
+            );
+
+            input = result.newCurrent;
+            currentDisplay.innerHTML = result.newCurrent;
+            historicalDisplay.innerHTML = result.newHistorical;
         } else if (keyValue === ":)") {
             console.log("V-(~_^)v");
         } else if (keyValue === "x²") {
@@ -33,6 +49,23 @@ for (let key of keys) {
 }
 
 function HandlePlusMinus(input, current, historical) {
+    const endValue = historical.slice(-1);
+    const splitHistorical = historical.split(" ");
+    const operators = ["+", "-", "×", "÷"];
+
+    let newCurrent = eval(current * -1);
+    let newHistorical = historical;
+
+    if (operators.includes(endValue) && input === "") {
+        newHistorical = `${historical} (${newCurrent})`;
+    } else if (endValue === "=") {
+        newHistorical = `(${newCurrent})`;
+    } else if (endValue === ")") {
+        splitHistorical[splitHistorical.length - 1] = `(${newCurrent})`;
+        newHistorical = splitHistorical.join(" ");
+    }
+
+    return { newCurrent, newHistorical };
 }
 
 function HandleCommas(input) {
