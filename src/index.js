@@ -3,18 +3,22 @@ const OPERATORS = ["+", "-", "×", "÷"];
 const keys = document.querySelectorAll("input");
 const currentDisplay = document.querySelector(".current");
 const historicalDisplay = document.querySelector(".historical");
-let input = "7";
-
-console.log("currentDisplay", currentDisplay.innerHTML);
-console.log("historicalDisplay", historicalDisplay.innerHTML);
-console.log("input:", input);
+let input = "";
 
 for (let key of keys) {
     const keyValue = key.value;
-    console.log("keyValue:", keyValue);
 
     key.addEventListener("click", () => {
-        if (keyValue === "C") {
+        if (keyValue === "=") {
+            const result = FindSolution(
+                currentDisplay.innerHTML,
+                historicalDisplay.innerHTML
+            );
+
+            input = "";
+            currentDisplay.innerHTML = result.newCurrent;
+            historicalDisplay.innerHTML = result.newHistorical;
+        } else if (keyValue === "C") {
             input = "";
             currentDisplay.innerHTML = "0";
             historicalDisplay.innerHTML = "";
@@ -38,18 +42,25 @@ for (let key of keys) {
             historicalDisplay.innerHTML = result.newHistorical;
         } else if (keyValue === ":)") {
             console.log("V-(~_^)v");
-        } else if (keyValue === "x²") {
-            // do math
-        } else if (keyValue === "xⁿ") {
-            // do math
-        } else if (keyValue === "%") {
-            // do math
-        } else if (keyValue === "=") {
-            const mathProblem = historicalDisplay.innerHTML.concat(" ", input); // might need a function to handle when this already ends with =
-            const result = FindSolution(input, mathProblem);
+        } else if (keyValue === "x²" || keyValue === "xⁿ") {
+            const result = HandleExponents(
+                keyValue,
+                currentDisplay.innerHTML,
+                historicalDisplay.innerHTML
+            );
 
-            historicalDisplay.innerHTML = mathProblem + " =";
-            currentDisplay.innerHTML = result;
+            input = "";
+            currentDisplay.innerHTML = result.newCurrent;
+            historicalDisplay.innerHTML = result.newHistorical;
+        } else if (keyValue === "%") {
+            const result = HandlePercentage(
+                currentDisplay.innerHTML,
+                historicalDisplay.innerHTML
+            );
+
+            input = "";
+            currentDisplay.innerHTML = result.newCurrent;
+            historicalDisplay.innerHTML = result.newHistorical;
         } else if (OPERATORS.includes(keyValue)) {
             const result = HandleOperator(
                 keyValue,
@@ -80,6 +91,31 @@ for (let key of keys) {
     });
 }
 
+function FindSolution(current, historical) {
+    const endValue = historical.slice(-1);
+    const splitHistorical = historical.split(" ");
+
+    let newCurrent = current;
+    let newHistorical = historical;
+
+    if (OPERATORS.includes(endValue) || endValue === "*") {
+        const fixedMultAndDiv = historical.replace("×", "*").replace("÷", "/");
+        newCurrent = eval(fixedMultAndDiv.concat(current));
+        newHistorical = `${historical} ${current} =`;
+    } else if (endValue === "=") {
+        splitHistorical[0] = current;
+        newHistorical = splitHistorical.join(" ");
+        splitHistorical.pop();
+        const fixedMultAndDiv = splitHistorical
+            .join(" ")
+            .replace("×", "*")
+            .replace("÷", "/");
+        newCurrent = eval(fixedMultAndDiv);
+    }
+
+    return { newCurrent, newHistorical };
+}
+
 function ValidateNumberAndDecimal(keyValue, current, historical) {
     const endValue = historical.slice(-1);
     const hasDecimal = current.includes(".");
@@ -98,6 +134,10 @@ function HandleOperator(keyValue, input, current, historical) {
 
     if (!historical || endValue === "=") {
         newHistorical = `${current} ${keyValue}`;
+    } else if (endValue === "*") {
+        const result = eval(historical.concat(current));
+        newCurrent = result;
+        newHistorical = `${newCurrent} ${keyValue}`;
     } else if (OPERATORS.includes(endValue)) {
         if (input === "") {
             newHistorical = historical
@@ -112,10 +152,7 @@ function HandleOperator(keyValue, input, current, historical) {
             newHistorical = `${newCurrent} ${keyValue}`;
         }
     } else {
-        // endValue is ")"
-        console.log("historical: ", newHistorical);
         const fixedMultAndDiv = historical.replace("×", "*").replace("÷", "/");
-        console.log("fixed: ", fixedMultAndDiv);
         const result = eval(fixedMultAndDiv);
         newCurrent = result;
         newHistorical = `${newCurrent} ${keyValue}`;
@@ -132,7 +169,7 @@ function HandlePlusMinus(input, current, historical) {
     let newHistorical = historical;
 
     if (OPERATORS.includes(endValue) && input === "") {
-        newHistorical = `${historical} (${newCurrent})`;
+        newHistorical += ` (${newCurrent})`;
     } else if (endValue === "=") {
         newHistorical = `${newCurrent}`;
     } else if (endValue === ")") {
@@ -143,18 +180,72 @@ function HandlePlusMinus(input, current, historical) {
     return { newCurrent, newHistorical };
 }
 
-function HandlePercentage(input) {
-    // handles % button
-    return input;
+function HandleExponents(keyValue, current, historical) {
+    const endValue = historical.slice(-1);
+    const splitHistorical = historical.split(" ");
+    const hasOperator = OPERATORS.some((operator) =>
+        historical.includes(operator)
+    );
+
+    let newCurrent = current;
+    let newHistorical = historical;
+
+    if (endValue === "*") {
+        return { newCurrent, newHistorical };
+    }
+
+    if (keyValue === "x²") {
+        newCurrent = eval(current ** 2);
+
+        if (OPERATORS.includes(endValue)) {
+            newHistorical += ` ${newCurrent}`;
+        } else if (endValue !== "=" && hasOperator) {
+            splitHistorical[splitHistorical.length - 1] = newCurrent;
+            newHistorical = splitHistorical.join(" ");
+        } else {
+            newHistorical = newCurrent;
+        }
+    }
+
+    if (keyValue === "xⁿ") {
+        if (!historical || endValue === "=")
+            newHistorical = newCurrent.concat("**");
+        else if (OPERATORS.includes(endValue))
+            newHistorical = `${historical} ${newCurrent}**`;
+        else newHistorical += "**";
+
+        newCurrent = 0;
+    }
+
+    return { newCurrent, newHistorical };
 }
 
-function CleanInput(input) {
-    // adds and handles commas
-    return input;
-}
+function HandlePercentage(current, historical) {
+    const endValue = historical.slice(-1);
+    const hasOperator = OPERATORS.some((operator) =>
+        historical.includes(operator)
+    );
+    const splitHistorical = historical.split(" ");
 
-function FindSolution(input, mathProblem) {
-    // handle all the different scenarios the calculator faces
-    let result = 0;
-    return result;
+    let newCurrent = current;
+    let newHistorical = historical;
+
+    if (!historical) {
+        newCurrent = eval((0 * current) / 100);
+        newHistorical = newCurrent;
+    } else if (OPERATORS.includes(endValue)) {
+        const base = splitHistorical[0];
+        newCurrent = eval((base * current) / 100);
+        newHistorical = `${historical} ${newCurrent}`;
+    } else if (hasOperator) {
+        const base = eval(historical);
+        newCurrent = eval((base * current) / 100);
+        splitHistorical[splitHistorical.length - 1] = newCurrent;
+        newHistorical = splitHistorical.join(" ");
+    } else if (endValue === "=") {
+        newCurrent = eval(current / 100);
+        newHistorical = newCurrent;
+    }
+
+    return { newCurrent, newHistorical };
 }
