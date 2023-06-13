@@ -16,14 +16,16 @@ for (let key of keys) {
     key.addEventListener("click", () => {
         if (keyValue === "C") {
             input = "";
-            currentDisplay.innerHTML = "";
+            currentDisplay.innerHTML = "0";
             historicalDisplay.innerHTML = "";
         } else if (keyValue === "CE") {
             input = "";
-            currentDisplay.innerHTML = "";
+            currentDisplay.innerHTML = "0";
         } else if (keyValue === "←") {
             input = input.slice(0, -1);
-            currentDisplay.innerHTML = input;
+            !input.length
+                ? (currentDisplay.innerHTML = 0)
+                : (currentDisplay.innerHTML = input);
         } else if (keyValue === "+/-") {
             const result = HandlePlusMinus(
                 input,
