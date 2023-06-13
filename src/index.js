@@ -1,251 +1,283 @@
 const OPERATORS = ["+", "-", "×", "÷"];
+const KEYBOARD_OPERATORS = ["+", "-", "*", "/"];
+const KEYBOARD_NUMS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
 const keys = document.querySelectorAll("input");
 const currentDisplay = document.querySelector(".current");
 const historicalDisplay = document.querySelector(".historical");
 let input = "";
 
+// TODO: Fix "Enter" keydown
+// TODO: Fix Backspace on input "" and historical ""
+
+document.addEventListener("keydown", handleKeydown);
+
 for (let key of keys) {
-    const keyValue = key.value;
-
-    key.addEventListener("click", () => {
-        if (keyValue === "=") {
-            const result = FindSolution(
-                currentDisplay.innerHTML,
-                historicalDisplay.innerHTML
-            );
-
-            input = "";
-            currentDisplay.innerHTML = result.newCurrent;
-            historicalDisplay.innerHTML = result.newHistorical;
-        } else if (keyValue === "C") {
-            input = "";
-            currentDisplay.innerHTML = "0";
-            historicalDisplay.innerHTML = "";
-        } else if (keyValue === "CE") {
-            input = "";
-            currentDisplay.innerHTML = "0";
-        } else if (keyValue === "←") {
-            input = input.slice(0, -1);
-            !input.length
-                ? (historicalDisplay.innerHTML = "")
-                : (currentDisplay.innerHTML = input);
-        } else if (keyValue === "+/-") {
-            const result = HandlePlusMinus(
-                input,
-                currentDisplay.innerHTML,
-                historicalDisplay.innerHTML
-            );
-
-            input = result.newCurrent;
-            currentDisplay.innerHTML = result.newCurrent;
-            historicalDisplay.innerHTML = result.newHistorical;
-        } else if (keyValue === ":)") {
-            console.log("V-(~_^)v");
-        } else if (keyValue === "x²" || keyValue === "xⁿ") {
-            const result = HandleExponents(
-                keyValue,
-                currentDisplay.innerHTML,
-                historicalDisplay.innerHTML
-            );
-
-            input = "";
-            currentDisplay.innerHTML = result.newCurrent;
-            historicalDisplay.innerHTML = result.newHistorical;
-        } else if (keyValue === "%") {
-            const result = HandlePercentage(
-                currentDisplay.innerHTML,
-                historicalDisplay.innerHTML
-            );
-
-            input = "";
-            currentDisplay.innerHTML = result.newCurrent;
-            historicalDisplay.innerHTML = result.newHistorical;
-        } else if (OPERATORS.includes(keyValue)) {
-            const result = HandleOperator(
-                keyValue,
-                input,
-                currentDisplay.innerHTML,
-                historicalDisplay.innerHTML
-            );
-
-            input = "";
-            currentDisplay.innerHTML = result.newCurrent;
-            historicalDisplay.innerHTML = result.newHistorical;
-        } else {
-            const validatedNumberOrDecimal = ValidateNumberAndDecimal(
-                keyValue,
-                currentDisplay.innerHTML,
-                historicalDisplay.innerHTML
-            );
-
-            if (validatedNumberOrDecimal === "newEntry") {
-                input = keyValue;
-                currentDisplay.innerHTML = input;
-                historicalDisplay.innerHTML = "";
-            } else if (validatedNumberOrDecimal === "grow") {
-                input += keyValue;
-                currentDisplay.innerHTML = input;
-            }
-        }
-    });
+    key.addEventListener("click", handleClick);
 }
 
-function FindSolution(current, historical) {
-    const endValue = historical.slice(-1);
-    const splitHistorical = historical.split(" ");
+function handleClick(event) {
+    const keyValue = event.target.value;
 
-    let newCurrent = current;
-    let newHistorical = historical;
+    if (keyValue === "C") {
+        input = "";
+        currentDisplay.innerHTML = "0";
+        historicalDisplay.innerHTML = "";
+    } else if (keyValue === "CE") {
+        input = "";
+        currentDisplay.innerHTML = "0";
+    } else if (keyValue === "←") {
+        input = input.slice(0, -1);
+        !input.length
+            ? (historicalDisplay.innerHTML = "")
+            : (currentDisplay.innerHTML = input);
+    } else if (keyValue === "=") {
+        handleEqual();
+    } else if (keyValue === "+/-") {
+        handlePlusMinus();
+    } else if (keyValue === ":)") {
+        console.log("V-(~_^)v");
+    } else if (keyValue === "x²" || keyValue === "xⁿ") {
+        handleExponentiation(keyValue);
+    } else if (keyValue === "%") {
+        handlePercentage();
+    } else if (OPERATORS.includes(keyValue)) {
+        handleOperators(keyValue);
+    } else {
+        validateNumbersAndDecimal(keyValue);
+    }
+}
 
-    if (OPERATORS.includes(endValue) || endValue === "*") {
-        const fixedMultAndDiv = historical.replace("×", "*").replace("÷", "/");
-        newCurrent = eval(fixedMultAndDiv.concat(current));
-        newHistorical = `${historical} ${current} =`;
-    } else if (endValue === "=") {
-        splitHistorical[0] = current;
-        newHistorical = splitHistorical.join(" ");
+function handleKeydown(event) {
+    const keyValue = event.key;
+
+    if (keyValue === "Escape") {
+        input = "";
+        currentDisplay.innerHTML = "0";
+        historicalDisplay.innerHTML = "";
+    } else if (keyValue === "Delete") {
+        input = "";
+        currentDisplay.innerHTML = "0";
+    } else if (keyValue === "Backspace") {
+        input = input.slice(0, -1);
+        !input.length
+            ? (historicalDisplay.innerHTML = "")
+            : (currentDisplay.innerHTML = input);
+    } else if (keyValue === "Enter" || keyValue === "=") {
+        handleEqual();
+    } else if (keyValue === "?") {
+        handlePlusMinus();
+    } else if (keyValue === "s") {
+        handleExponentiation(keyValue);
+    } else if (keyValue === "^") {
+        handleExponentiation(keyValue);
+    } else if (keyValue === "%") {
+        handlePercentage();
+    } else if (KEYBOARD_OPERATORS.includes(keyValue)) {
+        handleOperators(keyValue);
+    } else if (KEYBOARD_NUMS.includes(keyValue)) {
+        validateNumbersAndDecimal(keyValue);
+    }
+}
+
+function validateNumbersAndDecimal(keyValue) {
+    const initialCurrent = currentDisplay.innerHTML;
+    const initialHistorical = historicalDisplay.innerHTML;
+
+    const endValue = initialHistorical.slice(-1);
+    const hasDecimal = initialCurrent.includes(".");
+
+    if (endValue === "=") {
+        currentDisplay.innerHTML = keyValue;
+        historicalDisplay.innerHTML = "";
+    } else {
+        if (
+            !(keyValue === "." && hasDecimal) &&
+            !(keyValue === "0" && initialCurrent === "0")
+        ) {
+            input += keyValue;
+            currentDisplay.innerHTML = input;
+        }
+    }
+}
+
+function handleEqual() {
+    const initialCurrent = currentDisplay.innerHTML;
+    const initialHistorical = historicalDisplay.innerHTML;
+
+    const endValue = initialHistorical.slice(-1);
+    const splitHistorical = initialHistorical.split(" ");
+
+    if (endValue === "=") {
+        splitHistorical[0] = initialCurrent;
+        historicalDisplay.innerHTML = splitHistorical.join(" ");
         splitHistorical.pop();
         const fixedMultAndDiv = splitHistorical
             .join(" ")
             .replace("×", "*")
             .replace("÷", "/");
-        newCurrent = eval(fixedMultAndDiv);
+        currentDisplay.innerHTML = eval(fixedMultAndDiv);
+    } else if (OPERATORS.includes(endValue) || endValue === "*") {
+        const fixedMultAndDiv = initialHistorical
+            .replace("×", "*")
+            .replace("÷", "/");
+        currentDisplay.innerHTML = eval(fixedMultAndDiv.concat(initialCurrent));
+        historicalDisplay.innerHTML = `${initialHistorical} ${initialCurrent} =`;
+    } else if (!initialHistorical) {
+        currentDisplay.innerHTML = "0";
+        historicalDisplay.innerHTML = `${initialCurrent} =`;
+    } else {
+        const fixedMultAndDiv = initialHistorical
+            .replace("×", "*")
+            .replace("÷", "/");
+        currentDisplay.innerHTML = eval(fixedMultAndDiv);
+        historicalDisplay.innerHTML = `${initialHistorical} =`;
     }
 
-    return { newCurrent, newHistorical };
+    input = "";
 }
 
-function ValidateNumberAndDecimal(keyValue, current, historical) {
-    const endValue = historical.slice(-1);
-    const hasDecimal = current.includes(".");
+function handleOperators(keyValue) {
+    if (keyValue === "*") keyValue = "×";
+    else if (keyValue === "/") keyValue = "÷";
 
-    if (keyValue === "." && hasDecimal) return "ignore";
-    else if (keyValue === "0" && current === "0") return "ignore";
-    else if (endValue === "=") return "newEntry";
-    else return "grow";
-}
+    const initialCurrent = currentDisplay.innerHTML;
+    const initialHistorical = historicalDisplay.innerHTML;
 
-function HandleOperator(keyValue, input, current, historical) {
-    const endValue = historical.slice(-1);
+    const endValue = initialHistorical.slice(-1);
 
-    let newCurrent = current;
-    let newHistorical = historical;
-
-    if (!historical || endValue === "=") {
-        newHistorical = `${current} ${keyValue}`;
+    if (!initialHistorical || endValue === "=") {
+        historicalDisplay.innerHTML = `${initialCurrent} ${keyValue}`;
     } else if (endValue === "*") {
-        const result = eval(historical.concat(current));
-        newCurrent = result;
-        newHistorical = `${newCurrent} ${keyValue}`;
+        const newCurrent = eval(initialHistorical.concat(initialCurrent));
+        currentDisplay.innerHTML = newCurrent;
+        historicalDisplay.innerHTML = `${newCurrent} ${keyValue}`;
     } else if (OPERATORS.includes(endValue)) {
         if (input === "") {
-            newHistorical = historical
-                .substring(0, historical.length - 1)
+            historicalDisplay.innerHTML = initialHistorical
+                .substring(0, initialHistorical.length - 1)
                 .concat(keyValue);
         } else {
-            const fixedMultAndDiv = historical
+            const fixedMultAndDiv = initialHistorical
                 .replace("×", "*")
                 .replace("÷", "/");
-            const result = eval(fixedMultAndDiv.concat(current));
-            newCurrent = result;
-            newHistorical = `${newCurrent} ${keyValue}`;
+            const newCurrent = eval(fixedMultAndDiv.concat(initialCurrent));
+            currentDisplay.innerHTML = newCurrent;
+            historicalDisplay.innerHTML = `${newCurrent} ${keyValue}`;
         }
     } else {
-        const fixedMultAndDiv = historical.replace("×", "*").replace("÷", "/");
-        const result = eval(fixedMultAndDiv);
-        newCurrent = result;
-        newHistorical = `${newCurrent} ${keyValue}`;
+        const fixedMultAndDiv = initialHistorical
+            .replace("×", "*")
+            .replace("÷", "/");
+        const newCurrent = eval(fixedMultAndDiv);
+        currentDisplay.innerHTML = newCurrent;
+        historicalDisplay.innerHTML = `${newCurrent} ${keyValue}`;
     }
 
-    return { newCurrent, newHistorical };
+    input = "";
 }
 
-function HandlePlusMinus(input, current, historical) {
-    const endValue = historical.slice(-1);
-    const splitHistorical = historical.split(" ");
+function handlePlusMinus() {
+    const initialCurrent = currentDisplay.innerHTML;
+    const initialHistorical = historicalDisplay.innerHTML;
 
-    let newCurrent = eval(current * -1);
-    let newHistorical = historical;
+    const endValue = initialHistorical.slice(-1);
+    const splitHistorical = initialHistorical.split(" ");
+
+    const newCurrent = eval(initialCurrent * -1);
+    currentDisplay.innerHTML = newCurrent;
 
     if (OPERATORS.includes(endValue) && input === "") {
-        newHistorical += ` (${newCurrent})`;
+        historicalDisplay.innerHTML += ` (${newCurrent})`;
+    } else if (OPERATORS.includes(endValue) && input.length) {
+        historicalDisplay.innerHTML;
     } else if (endValue === "=") {
-        newHistorical = `${newCurrent}`;
+        historicalDisplay.innerHTML = `${newCurrent}`;
     } else if (endValue === ")") {
         splitHistorical[splitHistorical.length - 1] = `(${newCurrent})`;
-        newHistorical = splitHistorical.join(" ");
+        historicalDisplay.innerHTML = splitHistorical.join(" ");
+    } else {
+        historicalDisplay.innerHTML = newCurrent;
     }
-
-    return { newCurrent, newHistorical };
 }
 
-function HandleExponents(keyValue, current, historical) {
-    const endValue = historical.slice(-1);
-    const splitHistorical = historical.split(" ");
+function handleExponentiation(keyValue) {
+    if (keyValue === "s") keyValue = "x²";
+    if (keyValue === "^") keyValue = "xⁿ";
+
+    const initialCurrent = currentDisplay.innerHTML;
+    const initialHistorical = historicalDisplay.innerHTML;
+
+    const endValue = initialHistorical.slice(-1);
+    const splitHistorical = initialHistorical.split(" ");
     const hasOperator = OPERATORS.some((operator) =>
-        historical.includes(operator)
+        initialHistorical.includes(operator)
     );
 
-    let newCurrent = current;
-    let newHistorical = historical;
-
-    if (endValue === "*") {
-        return { newCurrent, newHistorical };
-    }
+    if (endValue === "*") return;
 
     if (keyValue === "x²") {
-        newCurrent = eval(current ** 2);
+        const newCurrent = eval(initialCurrent ** 2);
+        currentDisplay.innerHTML = newCurrent;
 
         if (OPERATORS.includes(endValue)) {
-            newHistorical += ` ${newCurrent}`;
+            historicalDisplay.innerHTML += ` ${newCurrent}`;
         } else if (endValue !== "=" && hasOperator) {
             splitHistorical[splitHistorical.length - 1] = newCurrent;
-            newHistorical = splitHistorical.join(" ");
+            historicalDisplay.innerHTML = splitHistorical.join(" ");
         } else {
-            newHistorical = newCurrent;
+            historicalDisplay.innerHTML = newCurrent;
         }
     }
 
     if (keyValue === "xⁿ") {
-        if (!historical || endValue === "=")
-            newHistorical = newCurrent.concat("**");
+        if (!initialHistorical || endValue === "=")
+            historicalDisplay.innerHTML = initialCurrent.concat(" **");
         else if (OPERATORS.includes(endValue))
-            newHistorical = `${historical} ${newCurrent}**`;
-        else newHistorical += "**";
+            historicalDisplay.innerHTML = `${initialHistorical} ${initialCurrent} **`;
+        else historicalDisplay.innerHTML += " **";
 
-        newCurrent = 0;
+        currentDisplay.innerHTML = 0;
     }
 
-    return { newCurrent, newHistorical };
+    input = "";
 }
 
-function HandlePercentage(current, historical) {
-    const endValue = historical.slice(-1);
+function handlePercentage() {
+    const initialCurrent = currentDisplay.innerHTML;
+    const initialHistorical = historicalDisplay.innerHTML;
+
+    const endValue = initialHistorical.slice(-1);
     const hasOperator = OPERATORS.some((operator) =>
-        historical.includes(operator)
+        initialHistorical.includes(operator)
     );
-    const splitHistorical = historical.split(" ");
+    const splitHistorical = initialHistorical.split(" ");
 
-    let newCurrent = current;
-    let newHistorical = historical;
+    let newCurrent;
 
-    if (!historical) {
-        newCurrent = eval((0 * current) / 100);
-        newHistorical = newCurrent;
+    if (!initialHistorical) {
+        newCurrent = eval((0 * initialCurrent) / 100);
+        currentDisplay.innerHTML = newCurrent;
+        historicalDisplay.innerHTML = newCurrent;
     } else if (OPERATORS.includes(endValue)) {
         const base = splitHistorical[0];
-        newCurrent = eval((base * current) / 100);
-        newHistorical = `${historical} ${newCurrent}`;
+        newCurrent = eval((base * initialCurrent) / 100);
+        currentDisplay.innerHTML = newCurrent;
+        historicalDisplay.innerHTML = `${initialHistorical} ${newCurrent}`;
     } else if (hasOperator) {
-        const base = eval(historical);
-        newCurrent = eval((base * current) / 100);
+        const fixedMultAndDiv = initialHistorical
+            .replace("×", "*")
+            .replace("÷", "/");
+        const base = eval(fixedMultAndDiv);
+        newCurrent = eval((base * initialCurrent) / 100);
+        currentDisplay.innerHTML = newCurrent;
         splitHistorical[splitHistorical.length - 1] = newCurrent;
-        newHistorical = splitHistorical.join(" ");
+        historicalDisplay.innerHTML = splitHistorical.join(" ");
     } else if (endValue === "=") {
-        newCurrent = eval(current / 100);
-        newHistorical = newCurrent;
+        newCurrent = eval(initialCurrent / 100);
+        currentDisplay.innerHTML = newCurrent;
+        historicalDisplay.innerHTML = newCurrent;
     }
 
-    return { newCurrent, newHistorical };
+    input = "";
 }
