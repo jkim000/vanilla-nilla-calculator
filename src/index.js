@@ -135,7 +135,7 @@ function HandlePlusMinus(input, current, historical) {
     if (operators.includes(endValue) && input === "") {
         newHistorical = `${historical} (${newCurrent})`;
     } else if (endValue === "=") {
-        newHistorical = `(${newCurrent})`;
+        newHistorical = `${newCurrent}`;
     } else if (endValue === ")") {
         splitHistorical[splitHistorical.length - 1] = `(${newCurrent})`;
         newHistorical = splitHistorical.join(" ");
