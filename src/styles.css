@@ -36,6 +36,7 @@
 }
 
 .historical {
+    height: 135px;
     margin: 2rem 0 0.6rem 0;
     color: #686868;
     font-size: large;
