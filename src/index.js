@@ -45,11 +45,78 @@ for (let key of keys) {
         } else if (keyValue === "+/-") {
             // do something
         } else if (keyValue === "=") {
+        } else if (OPERATORS.includes(keyValue)) {
+            const result = HandleOperator(
+                keyValue,
+                input,
+                currentDisplay.innerHTML,
+                historicalDisplay.innerHTML
+            );
+
+            input = "";
+            currentDisplay.innerHTML = result.newCurrent;
+            historicalDisplay.innerHTML = result.newHistorical;
         } else {
-            // finally handle numbers, decimals, and + - * / operators
-            // when operator pressed, keep current display but input should be reset to 0
+            const validatedNumberOrDecimal = ValidateNumberAndDecimal(
+                keyValue,
+                currentDisplay.innerHTML,
+                historicalDisplay.innerHTML
+            );
+
+            if (validatedNumberOrDecimal === "newEntry") {
+                input = keyValue;
+                currentDisplay.innerHTML = input;
+                historicalDisplay.innerHTML = "";
+            } else if (validatedNumberOrDecimal === "grow") {
+                input += keyValue;
+                currentDisplay.innerHTML = input;
+            }
         }
     });
+}
+
+function ValidateNumberAndDecimal(keyValue, current, historical) {
+    const endValue = historical.slice(-1);
+    const hasDecimal = current.includes(".");
+
+    if (keyValue === "." && hasDecimal) return "ignore";
+    else if (keyValue === "0" && current === "0") return "ignore";
+    else if (endValue === "=") return "newEntry";
+    else return "grow";
+}
+
+function HandleOperator(keyValue, input, current, historical) {
+    const endValue = historical.slice(-1);
+
+    let newCurrent = current;
+    let newHistorical = historical;
+
+    if (!historical || endValue === "=") {
+        newHistorical = `${current} ${keyValue}`;
+    } else if (OPERATORS.includes(endValue)) {
+        if (input === "") {
+            newHistorical = historical
+                .substring(0, historical.length - 1)
+                .concat(keyValue);
+        } else {
+            const fixedMultAndDiv = historical
+                .replace("×", "*")
+                .replace("÷", "/");
+            const result = eval(fixedMultAndDiv.concat(current));
+            newCurrent = result;
+            newHistorical = `${newCurrent} ${keyValue}`;
+        }
+    } else {
+        // endValue is ")"
+        console.log("historical: ", newHistorical);
+        const fixedMultAndDiv = historical.replace("×", "*").replace("÷", "/");
+        console.log("fixed: ", fixedMultAndDiv);
+        const result = eval(fixedMultAndDiv);
+        newCurrent = result;
+        newHistorical = `${newCurrent} ${keyValue}`;
+    }
+
+    return { newCurrent, newHistorical };
 }
 
 function HandlePlusMinus(input, current, historical) {
