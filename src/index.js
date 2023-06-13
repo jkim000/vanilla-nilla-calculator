@@ -7,9 +7,6 @@ const currentDisplay = document.querySelector(".current");
 const historicalDisplay = document.querySelector(".historical");
 let input = "";
 
-// TODO: Fix "Enter" keydown
-// TODO: Fix Backspace on input "" and historical ""
-
 document.addEventListener("keydown", handleKeydown);
 
 for (let key of keys) {
@@ -28,7 +25,9 @@ function handleClick(event) {
         currentDisplay.innerHTML = "0";
     } else if (keyValue === "←") {
         input = input.slice(0, -1);
-        !input.length
+        !input.length && currentDisplay.innerHTML !== "0"
+            ? (currentDisplay.innerHTML = "0")
+            : !input.length
             ? (historicalDisplay.innerHTML = "")
             : (currentDisplay.innerHTML = input);
     } else if (keyValue === "=") {
@@ -60,7 +59,9 @@ function handleKeydown(event) {
         currentDisplay.innerHTML = "0";
     } else if (keyValue === "Backspace") {
         input = input.slice(0, -1);
-        !input.length
+        !input.length && currentDisplay.innerHTML !== "0"
+            ? (currentDisplay.innerHTML = "0")
+            : !input.length
             ? (historicalDisplay.innerHTML = "")
             : (currentDisplay.innerHTML = input);
     } else if (keyValue === "Enter" || keyValue === "=") {
