@@ -28,7 +28,7 @@ for (let key of keys) {
         } else if (keyValue === "←") {
             input = input.slice(0, -1);
             !input.length
-                ? (currentDisplay.innerHTML = 0)
+                ? (historicalDisplay.innerHTML = "")
                 : (currentDisplay.innerHTML = input);
         } else if (keyValue === "+/-") {
             const result = HandlePlusMinus(
