@@ -3,7 +3,7 @@ const OPERATORS = ["+", "-", "×", "÷"];
 const keys = document.querySelectorAll("input");
 const currentDisplay = document.querySelector(".current");
 const historicalDisplay = document.querySelector(".historical");
-let input = "";
+let input = "7";
 
 console.log("currentDisplay", currentDisplay.innerHTML);
 console.log("historicalDisplay", historicalDisplay.innerHTML);
@@ -39,12 +39,17 @@ for (let key of keys) {
         } else if (keyValue === ":)") {
             console.log("V-(~_^)v");
         } else if (keyValue === "x²") {
-            // do something
+            // do math
         } else if (keyValue === "xⁿ") {
-            // do something
-        } else if (keyValue === "+/-") {
-            // do something
+            // do math
+        } else if (keyValue === "%") {
+            // do math
         } else if (keyValue === "=") {
+            const mathProblem = historicalDisplay.innerHTML.concat(" ", input); // might need a function to handle when this already ends with =
+            const result = FindSolution(input, mathProblem);
+
+            historicalDisplay.innerHTML = mathProblem + " =";
+            currentDisplay.innerHTML = result;
         } else if (OPERATORS.includes(keyValue)) {
             const result = HandleOperator(
                 keyValue,
@@ -139,22 +144,17 @@ function HandlePlusMinus(input, current, historical) {
     return { newCurrent, newHistorical };
 }
 
-function HandleCommas(input) {
-    // adds and handles commas
-    return input;
-}
-
-function ValidateInput(input) {
-    // determines if last string in input is an operator or decimal
-    return input;
-}
-
-function PrepareInput(input) {
+function HandlePercentage(input) {
     // handles % button
     return input;
 }
 
-function SolveMathProblem(mathProblem, input) {
+function CleanInput(input) {
+    // adds and handles commas
+    return input;
+}
+
+function FindSolution(input, mathProblem) {
     // handle all the different scenarios the calculator faces
     let result = 0;
     return result;
