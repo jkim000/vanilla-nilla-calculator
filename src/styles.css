@@ -13,7 +13,7 @@
     background-color: #474747;
 }
 
-.calculator {
+main {
     display: flex;
     flex-direction: column;
     width: 80%;
@@ -107,6 +107,6 @@ input {
     background-color: #008fc4;
 }
 
-.cursive {
+.fancyMathNotation {
     font-family: "Times New Roman", Times, serif;
 }
