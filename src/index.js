@@ -1,3 +1,5 @@
+const OPERATORS = ["+", "-", "×", "÷"];
+
 const keys = document.querySelectorAll("input");
 const currentDisplay = document.querySelector(".current");
 const historicalDisplay = document.querySelector(".historical");
@@ -125,12 +127,11 @@ function HandleOperator(keyValue, input, current, historical) {
 function HandlePlusMinus(input, current, historical) {
     const endValue = historical.slice(-1);
     const splitHistorical = historical.split(" ");
-    const operators = ["+", "-", "×", "÷"];
 
     let newCurrent = eval(current * -1);
     let newHistorical = historical;
 
-    if (operators.includes(endValue) && input === "") {
+    if (OPERATORS.includes(endValue) && input === "") {
         newHistorical = `${historical} (${newCurrent})`;
     } else if (endValue === "=") {
         newHistorical = `${newCurrent}`;
