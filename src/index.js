@@ -1,5 +1,3 @@
-const OPERATORS = ["+", "-", "×", "÷"];
-
 const keys = document.querySelectorAll("input");
 const currentDisplay = document.querySelector(".current");
 const historicalDisplay = document.querySelector(".historical");
